@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL_timer.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -13,10 +14,13 @@ vec3_t cube_points[N_POINTS]; // 9x9x9 cube
 vec2_t projected_points[N_POINTS];
 
 vec3_t camera_position = {.x = 0, .y = 0, .z = -5};
+vec3_t cube_rotation = {.x = 0, .y = 0, .z = 0};
 
 float fov_factor = 640;
 
 bool is_running = false;
+
+int previous_frame_time = 0;
 
 void setup(void) {
     
@@ -71,14 +75,28 @@ vec2_t project(vec3_t point) {
 }
 
 void update(void) {
+
+    while(!SDL_TICKS_PASSED(SDL_GetTicks(), previous_frame_time + FRAME_TARGET_TIME));
+
+    previous_frame_time = SDL_GetTicks();
+
+    cube_rotation.x += 0.01;
+    cube_rotation.y += 0.01;
+    cube_rotation.z += 0.01;
+
     for(int i = 0; i < N_POINTS; i++) {
         vec3_t point = cube_points[i];
-        
-        // Move the point away from the camera;
-        point.z -= camera_position.z;
+
+        // Rotate the obtained point
+        vec3_t transformed_point = vec3_rotate_x(point, cube_rotation.x);
+        transformed_point = vec3_rotate_y(transformed_point, cube_rotation.y);
+        transformed_point = vec3_rotate_z(transformed_point, cube_rotation.z);
+
+        // Translate the points away from the camera
+        transformed_point.z -= camera_position.z;
         
         // Project the current point
-        vec2_t projected_point = project(point);
+        vec2_t projected_point = project(transformed_point);
         // Save the projected 2D vector in the array of projected points
         projected_points[i] = projected_point;
     }
@@ -90,7 +108,7 @@ void render(void) {
     // Loop all projected points and render them
     for(int i = 0; i < N_POINTS; i++) {
         vec2_t projected_point = projected_points[i];
-        draw_rect(projected_point.x + (window_width / 2), projected_point.y + (window_height / 2), 4, 4, 0xFFFFFF00);
+        draw_rect(projected_point.x + (window_width / 2.0), projected_point.y + (window_height / 2.0), 4, 4, 0xFFFFFF00);
     }
     
     render_color_buffer();
