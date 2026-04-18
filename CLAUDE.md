@@ -7,13 +7,6 @@ This is a learning project. The user is building a 3D renderer from scratch to l
 - Compare buggy code to similar correct code elsewhere in the project when possible.
 - Encourage the user to reason through the problem themselves.
 
-## Project Overview
-- C-based 3D renderer using SDL2
-- Single source file: `3drenderer/src/main.c`
-- Uses a software color buffer rendered via an SDL texture
-
-## Build
-- Built via Xcode
 
 ## Commit Messages
 - Use short imperative style (e.g. "Add draw_rect function", "Fix buffer indexing", "Extract display code into separate files")
