@@ -11,6 +11,8 @@ add_executable(renderer
     src/main.c
     src/display.c
     src/vector.c
+    src/mesh.c
+    src/triangle.c
 )
 
 target_include_directories(renderer PRIVATE ${SDL2_INCLUDE_DIRS})

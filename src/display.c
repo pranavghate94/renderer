@@ -1,4 +1,6 @@
 #include "display.h"
+#include <math.h>
+#include <stdint.h>
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -59,6 +61,26 @@ void draw_pixel(int x, int y, uint32_t color) {
     if( x >= 0 && x < window_width && y >= 0 && y < window_height) {
         color_buffer[(window_width * y) + x] = color;
     }
+}
+
+void draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
+    int delta_x = x1 - x0;
+    int delta_y = y1 - y0;
+
+    int side_length = abs(delta_x) >= abs(delta_y) ? abs(delta_x) : abs(delta_y);
+    
+    float x_inc = delta_x / (float)side_length;
+    float y_inc = delta_y / (float)side_length;
+
+    float x_curr = x0;
+    float y_curr = y0;
+
+    for(int i=0; i<=side_length; i++) {
+        draw_pixel(round(x_curr), round(y_curr), color);
+        x_curr += x_inc;
+        y_curr += y_inc;
+    }
+
 }
 
 void draw_rect(int x, int y, int width, int height, uint32_t color) {
