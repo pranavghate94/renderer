@@ -119,7 +119,6 @@ void clear_color_buffer(uint32_t color) {
 void destroy_window(void)
 {
     // reverse order of everything you have created
-    free(color_buffer); // free the buffer
     SDL_DestroyRenderer(renderer); // free renderer
     SDL_DestroyWindow(window); // free window
     SDL_Quit();
