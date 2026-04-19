@@ -4,7 +4,7 @@ A software 3D renderer written from scratch in C using SDL2. No GPU acceleration
 
 ## What it does
 
-Renders a rotating 9x9x9 point cloud cube using perspective projection. Points are transformed in 3D (rotation around all three axes), projected onto 2D, and drawn to the screen at 30 FPS.
+Renders a rotating wireframe cube as a mesh of triangles. Each frame, vertices are rotated around all three axes, projected to 2D with perspective, and the triangle edges are drawn with a DDA line algorithm. Runs at 30 FPS.
 
 ## Building
 
@@ -20,7 +20,10 @@ make clean  # removes the build directory
 
 ```
 src/
-  main.c      - game loop, setup, projection, and rendering
-  display.c/h - window management, color buffer, and drawing primitives
-  vector.c/h  - vec2/vec3 types and rotation functions
+  main.c       - game loop, setup, projection, and rendering
+  display.c/h  - window management, color buffer, and drawing primitives (pixel, line, rect, triangle)
+  vector.c/h   - vec2/vec3 types and rotation functions
+  triangle.c/h - triangle_t (three projected 2D points)
+  mesh.c/h     - mesh_t with dynamic vertex/face arrays; hardcoded cube data and loader
+  array.c/h    - generic dynamic array (stretchy buffer) via array_push / array_length / array_free
 ```
