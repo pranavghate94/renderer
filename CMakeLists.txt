@@ -9,6 +9,7 @@ find_package(SDL2 REQUIRED)
 
 add_executable(renderer
     src/main.c
+    src/array.c
     src/display.c
     src/vector.c
     src/mesh.c
