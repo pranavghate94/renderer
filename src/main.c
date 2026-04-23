@@ -11,10 +11,8 @@
 #include "vector.h"
 #include "mesh.h"
 
-// triangle_t triangles_to_render[N_MESH_FACES];
 triangle_t* triangles_to_render = NULL;
 vec3_t camera_position = {.x = 0, .y = 0, .z = -5};
-// vec3_t cube_rotation = {.x = 0, .y = 0, .z = 0};
 float fov_factor = 640;
 bool is_running = false;
 int previous_frame_time = 0;
@@ -24,7 +22,7 @@ void setup(void) {
     // Allocate memory for the color buffer
     color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
     
-    // Creating an SDL texture that is used to displa the color buffer
+    // Creating an SDL texture that is used to display the color buffer
     color_buffer_texture = SDL_CreateTexture(
         renderer,
         SDL_PIXELFORMAT_ARGB8888,
@@ -34,9 +32,14 @@ void setup(void) {
     );
 
     // Loads the cube data into the global mesh data structure / variable
-    load_cube_mesh_data();
-    
+    // load_cube_mesh_data();
+
+    // Load OBJ mesh data into mesh global variable
+    load_obj_file_data("../assets/f22.obj");
+
+
 }
+
 
 void process_input(void) {
     SDL_Event event;
@@ -50,6 +53,7 @@ void process_input(void) {
             if(event.key.keysym.sym == SDLK_ESCAPE)
                 is_running = false;
             break;
+        default: ;
     }
 }
 
@@ -80,9 +84,9 @@ void update(void) {
     // Initialize the dynamic array of triangles to render (reset to NULL)
     triangles_to_render = NULL;
 
-    mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.01;
-    mesh.rotation.z += 0.01;
+    // mesh.rotation.x += 0.01;
+    // mesh.rotation.y += 0.01;
+    // mesh.rotation.z += 0.01;
 
     // Loop all the traingle faces of our mesh
     int num_faces = array_length(mesh.faces);
@@ -118,9 +122,6 @@ void update(void) {
             projected_triangle.points[j] = projected_point;
         }
 
-        // Save the projected triangle in the array of triangles to render
-        // triangles_to_render[i] = projected_triangle;
-    
         // Save the projected triangle in the dynamic array of triangles
         array_push(triangles_to_render, projected_triangle);
     }
