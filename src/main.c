@@ -31,9 +31,6 @@ void setup(void) {
         window_height
     );
 
-    // Loads the cube data into the global mesh data structure / variable
-    // load_cube_mesh_data();
-
     // Load OBJ mesh data into mesh global variable
     load_obj_file_data("./assets/f22.obj");
 
@@ -67,9 +64,6 @@ vec2_t project(vec3_t point) {
 }
 
 void update(void) {
-
-    // Old method - using a naive while loop to wait - wasted CPU cycles just to wait - Also called busy waiting
-    // while(!SDL_TICKS_PASSED(SDL_GetTicks(), previous_frame_time + FRAME_TARGET_TIME));
 
     // Wait some time until we reach the target frame time in ms
     int time_to_wait = FRAME_TARGET_TIME -(SDL_GetTicks() - previous_frame_time);
