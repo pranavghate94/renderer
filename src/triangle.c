@@ -8,7 +8,7 @@ void int_swap(int* a, int* b) {
 }
 
 // Draw filled triangle with a flat bottom
-void fill_flat_bottom_triangle(int x0, int x1, int y0, int y1, int x2, int y2, uint32_t color) {
+void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
     // Find the triangle legs
     // Inverted Slopes (change in X / change in Y) 
     float inv_slope_1 = (float)(x1 - x0) / (y1 - y0); 
@@ -18,7 +18,7 @@ void fill_flat_bottom_triangle(int x0, int x1, int y0, int y1, int x2, int y2, u
     float x_start = x0;
     float x_end = x0;
 
-    // Loop all the scalines from top to bottom
+    // Loop all the scanlines from top to bottom
     for(int y=y0; y<=y2; y++) {
         draw_line(x_start, y, x_end, y, color);
         x_start += inv_slope_1;
