@@ -29,8 +29,22 @@ void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u
 
 
 // Draw filled triangle with a flat top
-void fill_flat_top_triangle(int x0, int x1, int y0, int y1, int x2, int y2, uint32_t color) {
+void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
+    // Find the triangle legs
+    // Inverted Slopes
+    float inv_slope_1 = (float)(x2 - x0) / (y2 - y0);
+    float inv_slope_2 = (float)(x2 - x1) / (y2 - y1);
 
+    // Start x_start and x_end from the bottom vertex (x2, y2)
+    float x_start = x2;
+    float x_end = x2;
+
+    // Loop all the scanlines from bottom to top
+    for(int y=y2; y>=y0; y--) {
+        draw_line(x_start, y, x_end, y, color);
+        x_start -= inv_slope_1;
+        x_end -= inv_slope_2;
+    }
 }
 
 
