@@ -35,7 +35,7 @@ void setup(void) {
     // load_cube_mesh_data();
 
     // Load OBJ mesh data into mesh global variable
-    load_obj_file_data("../assets/f22.obj");
+    load_obj_file_data("./assets/f22.obj");
 
 
 }
