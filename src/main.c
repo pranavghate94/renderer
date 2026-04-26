@@ -78,9 +78,9 @@ void update(void) {
     // Initialize the dynamic array of triangles to render (reset to NULL)
     triangles_to_render = NULL;
 
-    // mesh.rotation.x += 0.01;
-    // mesh.rotation.y += 0.01;
-    // mesh.rotation.z += 0.01;
+    mesh.rotation.x += 0.01;
+    mesh.rotation.y += 0.01;
+    mesh.rotation.z += 0.01;
 
     // Loop all the traingle faces of our mesh
     int num_faces = array_length(mesh.faces);
