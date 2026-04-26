@@ -32,7 +32,7 @@ void setup(void) {
     );
 
     // Load OBJ mesh data into mesh global variable
-    load_obj_file_data("./assets/teapot.obj");
+    load_obj_file_data("./assets/f22.obj");
 
 
 }
