@@ -12,6 +12,7 @@ This is a learning project. The user is building a 3D renderer from scratch to l
 - Use short imperative style (e.g. "Add draw_rect function", "Fix buffer indexing", "Extract display code into separate files")
 - Start with a capital letter, no period at the end
 - Do NOT include a "Co-Authored-By" line
+- Split unrelated changes into separate commits — one logical change per commit (e.g. a new feature, a bug fix, and a cleanup should be three commits, not one)
 
 ## Key Concepts
 - Color buffer is a 1D array representing a 2D grid
