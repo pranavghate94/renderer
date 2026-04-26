@@ -11,14 +11,25 @@
 #include "vector.h"
 #include "mesh.h"
 
+#define FLAG_VERTICES 0b0001
+#define FLAG_WIREFRAME 0b0010
+#define FLAG_FILL 0b0100
+#define FLAG_CULLING 0b1000
+
 triangle_t* triangles_to_render = NULL;
 vec3_t camera_position = {0, 0, 0};
 float fov_factor = 640;
 bool is_running = false;
 int previous_frame_time = 0;
+int render_state = 0;
 
 void setup(void) {
     
+    // Start with Filling and Culling enabled
+    render_state |= FLAG_FILL;
+    render_state |= FLAG_CULLING;
+    render_state |= FLAG_WIREFRAME;
+
     // Allocate memory for the color buffer
     color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
     
@@ -49,6 +60,32 @@ void process_input(void) {
         case SDL_KEYDOWN:
             if(event.key.keysym.sym == SDLK_ESCAPE)
                 is_running = false;
+            else if(event.key.keysym.sym == SDLK_1) {
+                render_state |= FLAG_WIREFRAME;
+                render_state |= FLAG_VERTICES;
+                render_state &= ~FLAG_FILL;
+            }
+            else if(event.key.keysym.sym == SDLK_2) {
+                render_state |= FLAG_WIREFRAME;
+                render_state &= ~FLAG_VERTICES;
+                render_state &= ~FLAG_FILL;
+            }
+            else if(event.key.keysym.sym == SDLK_3) {
+                render_state &= ~FLAG_WIREFRAME;
+                render_state &= ~FLAG_VERTICES;
+                render_state |= FLAG_FILL;
+            }
+            else if(event.key.keysym.sym == SDLK_4) {
+                render_state |= FLAG_WIREFRAME;
+                render_state |= FLAG_VERTICES;
+                render_state |= FLAG_FILL;
+            }
+            else if(event.key.keysym.sym == SDLK_c) {
+                render_state |= FLAG_CULLING;
+            }
+            else if(event.key.keysym.sym == SDLK_d) {
+                render_state &= ~FLAG_CULLING;
+            }
             break;
         default: ;
     }
@@ -110,32 +147,35 @@ void update(void) {
             transformed_vertices[j] = transformed_vertex;
         }
 
-        // Check backface culling
-        vec3_t vector_a = transformed_vertices[0]; /* A */
-        vec3_t vector_b = transformed_vertices[1]; /* B */
-        vec3_t vector_c = transformed_vertices[2]; /* C */
+        if(render_state & FLAG_CULLING) {
+        
+            // Check backface culling
+            vec3_t vector_a = transformed_vertices[0]; /* A */
+            vec3_t vector_b = transformed_vertices[1]; /* B */
+            vec3_t vector_c = transformed_vertices[2]; /* C */
 
-        // Get vector subtraction of B-A and C-A
-        vec3_t vector_ab = vec3_sub(vector_b, vector_a);
-        vec3_t vector_ac = vec3_sub(vector_c, vector_a);
-        vec3_normalize(&vector_ab);
-        vec3_normalize(&vector_ac);
+            // Get vector subtraction of B-A and C-A
+            vec3_t vector_ab = vec3_sub(vector_b, vector_a);
+            vec3_t vector_ac = vec3_sub(vector_c, vector_a);
+            vec3_normalize(&vector_ab);
+            vec3_normalize(&vector_ac);
 
-        // Compute the face normal using cross product (we are using left-handed coordinate system)
-        vec3_t normal = vec3_cross(vector_ab, vector_ac);
+            // Compute the face normal using cross product (we are using left-handed coordinate system)
+            vec3_t normal = vec3_cross(vector_ab, vector_ac);
 
-        // Normalize the face normal vector (pass by reference)
-        vec3_normalize(&normal);
+            // Normalize the face normal vector (pass by reference)
+            vec3_normalize(&normal);
 
-        // Find the vector between a point in the triangle and the camera origin
-        vec3_t camera_ray = vec3_sub(camera_position, vector_a);
+            // Find the vector between a point in the triangle and the camera origin
+            vec3_t camera_ray = vec3_sub(camera_position, vector_a);
 
-        // Calculate how aligned the camera ray is with the face normal (using dot product)
-        float dot_normal_camera = vec3_dot(camera_ray, normal);
+            // Calculate how aligned the camera ray is with the face normal (using dot product)
+            float dot_normal_camera = vec3_dot(camera_ray, normal);
 
-        // bypass the triangles that are looking away from the camera
-        if (dot_normal_camera < 0) {
-            continue;
+            // bypass the triangles that are looking away from the camera
+            if (dot_normal_camera < 0) {
+                continue;
+            }
         }
 
         triangle_t projected_triangle;
@@ -165,22 +205,33 @@ void render(void) {
     int num_triangles = array_length(triangles_to_render);
     for(int i = 0; i< num_triangles; i++) {
         triangle_t triangle = triangles_to_render[i];
-    
+
+        // Draw vertices
+        if (render_state & FLAG_VERTICES) {
+            draw_rect(triangle.points[0].x, triangle.points[0].y, 5, 5, 0xFFFF0000);
+            draw_rect(triangle.points[1].x, triangle.points[1].y, 5, 5, 0xFFFF0000);
+            draw_rect(triangle.points[2].x, triangle.points[2].y, 5, 5, 0xFFFF0000);
+        }
+
         // Draw filled triangle face
-        draw_filled_triangle(
-            triangle.points[0].x, triangle.points[0].y,
-            triangle.points[1].x, triangle.points[1].y,
-            triangle.points[2].x, triangle.points[2].y,
-            0xFFFFFFFF
-        );
+        if (render_state & FLAG_FILL) {
+            draw_filled_triangle(
+                triangle.points[0].x, triangle.points[0].y,
+                triangle.points[1].x, triangle.points[1].y,
+                triangle.points[2].x, triangle.points[2].y,
+                0xFFBBBBBB
+            );
+        }
 
         // Draw unfilled triangle (wireframe)
-        draw_triangle(
-            triangle.points[0].x, triangle.points[0].y,
-            triangle.points[1].x, triangle.points[1].y,
-            triangle.points[2].x, triangle.points[2].y,
-            0xFF000000
-        );
+        if (render_state & FLAG_WIREFRAME) {
+            draw_triangle(
+                triangle.points[0].x, triangle.points[0].y,
+                triangle.points[1].x, triangle.points[1].y,
+                triangle.points[2].x, triangle.points[2].y,
+                0xFF00FF00
+            );
+        }
 
     }
 
