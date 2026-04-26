@@ -44,7 +44,7 @@ bool initialize_window(void) {
     }
     
     // Set Real Fullscreen
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
     return true;
 }
