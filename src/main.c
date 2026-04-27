@@ -37,8 +37,10 @@ void setup(void) {
         window_height
     );
 
+
     // Load OBJ mesh data into mesh global variable
-    load_obj_file_data("./assets/f22.obj");
+    load_cube_mesh_data();
+    // load_obj_file_data("./assets/f22.obj");
 
 
 }
