@@ -11,24 +11,19 @@
 #include "vector.h"
 #include "mesh.h"
 
-#define FLAG_VERTICES 0b0001
-#define FLAG_WIREFRAME 0b0010
-#define FLAG_FILL 0b0100
-#define FLAG_CULLING 0b1000
-
 triangle_t* triangles_to_render = NULL;
 vec3_t camera_position = {0, 0, 0};
+
 float fov_factor = 640;
 bool is_running = false;
+
 int previous_frame_time = 0;
-int render_state = 0;
 
 void setup(void) {
-    
-    // Start with Filling and Culling enabled
-    render_state |= FLAG_FILL;
-    render_state |= FLAG_CULLING;
-    render_state |= FLAG_WIREFRAME;
+
+    // Start with Wireframe and Culling enabled
+    render_method = RENDER_WIRE;
+    cull_method = CULL_BACKFACE;
 
     // Allocate memory for the color buffer
     color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
@@ -60,32 +55,18 @@ void process_input(void) {
         case SDL_KEYDOWN:
             if(event.key.keysym.sym == SDLK_ESCAPE)
                 is_running = false;
-            else if(event.key.keysym.sym == SDLK_1) {
-                render_state |= FLAG_WIREFRAME;
-                render_state |= FLAG_VERTICES;
-                render_state &= ~FLAG_FILL;
-            }
-            else if(event.key.keysym.sym == SDLK_2) {
-                render_state |= FLAG_WIREFRAME;
-                render_state &= ~FLAG_VERTICES;
-                render_state &= ~FLAG_FILL;
-            }
-            else if(event.key.keysym.sym == SDLK_3) {
-                render_state &= ~FLAG_WIREFRAME;
-                render_state &= ~FLAG_VERTICES;
-                render_state |= FLAG_FILL;
-            }
-            else if(event.key.keysym.sym == SDLK_4) {
-                render_state |= FLAG_WIREFRAME;
-                render_state |= FLAG_VERTICES;
-                render_state |= FLAG_FILL;
-            }
-            else if(event.key.keysym.sym == SDLK_c) {
-                render_state |= FLAG_CULLING;
-            }
-            else if(event.key.keysym.sym == SDLK_d) {
-                render_state &= ~FLAG_CULLING;
-            }
+            else if(event.key.keysym.sym == SDLK_1)
+                render_method = RENDER_WIRE_VERTEX;
+            else if(event.key.keysym.sym == SDLK_2)
+                render_method = RENDER_WIRE;
+            else if(event.key.keysym.sym == SDLK_3)
+                render_method = RENDER_FILL_TRIANGLE;
+            else if(event.key.keysym.sym == SDLK_4)
+                render_method = RENDER_FILL_TRIANGLE_WIRE;
+            else if(event.key.keysym.sym == SDLK_c)
+                cull_method = CULL_BACKFACE;
+            else if(event.key.keysym.sym == SDLK_d)
+                cull_method = CULL_NONE;
             break;
         default: ;
     }
@@ -147,7 +128,7 @@ void update(void) {
             transformed_vertices[j] = transformed_vertex;
         }
 
-        if(render_state & FLAG_CULLING) {
+        if(cull_method == CULL_BACKFACE) {
         
             // Check backface culling
             vec3_t vector_a = transformed_vertices[0]; /* A */
@@ -207,14 +188,14 @@ void render(void) {
         triangle_t triangle = triangles_to_render[i];
 
         // Draw vertices
-        if (render_state & FLAG_VERTICES) {
+        if (render_method == RENDER_WIRE_VERTEX) {
             draw_rect(triangle.points[0].x, triangle.points[0].y, 5, 5, 0xFFFF0000);
             draw_rect(triangle.points[1].x, triangle.points[1].y, 5, 5, 0xFFFF0000);
             draw_rect(triangle.points[2].x, triangle.points[2].y, 5, 5, 0xFFFF0000);
         }
 
         // Draw filled triangle face
-        if (render_state & FLAG_FILL) {
+        if (render_method == RENDER_FILL_TRIANGLE || render_method == RENDER_FILL_TRIANGLE_WIRE) {
             draw_filled_triangle(
                 triangle.points[0].x, triangle.points[0].y,
                 triangle.points[1].x, triangle.points[1].y,
@@ -224,7 +205,7 @@ void render(void) {
         }
 
         // Draw unfilled triangle (wireframe)
-        if (render_state & FLAG_WIREFRAME) {
+        if (render_method == RENDER_WIRE_VERTEX || render_method == RENDER_WIRE || render_method == RENDER_FILL_TRIANGLE_WIRE) {
             draw_triangle(
                 triangle.points[0].x, triangle.points[0].y,
                 triangle.points[1].x, triangle.points[1].y,
