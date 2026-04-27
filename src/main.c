@@ -161,19 +161,26 @@ void update(void) {
             }
         }
 
-        triangle_t projected_triangle;
+        vec2_t projected_points[3];
+
         // Loop all the three vertices to perform projection
         for (int j = 0; j<3; j++) {
-
             // Project our point after transforming
-            vec2_t projected_point = project(transformed_vertices[j]);
+            projected_points[j] = project(transformed_vertices[j]);
 
             // Scale and Translate Projected Point to the middle of the screen
-            projected_point.x += (window_width / 2.0);
-            projected_point.y += (window_height / 2.0);
-
-            projected_triangle.points[j] = projected_point;
+            projected_points[j].x += (window_width / 2.0);
+            projected_points[j].y += (window_height / 2.0);
         }
+
+        triangle_t projected_triangle = {
+            .points = {
+                {projected_points[0].x, projected_points[0].y},
+                {projected_points[1].x, projected_points[1].y},
+                {projected_points[2].x, projected_points[2].y}
+            },
+            .color = mesh_face.color
+        };
 
         // Save the projected triangle in the dynamic array of triangles
         array_push(triangles_to_render, projected_triangle);
@@ -202,7 +209,7 @@ void render(void) {
                 triangle.points[0].x, triangle.points[0].y,
                 triangle.points[1].x, triangle.points[1].y,
                 triangle.points[2].x, triangle.points[2].y,
-                0xFFBBBBBB
+                triangle.color
             );
         }
 
