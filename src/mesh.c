@@ -41,7 +41,7 @@ face_t cube_faces[N_CUBE_FACES] = {
     {.a = 2, .b = 5, .c = 3},
     // bottom
     {.a = 6, .b = 8, .c = 1},
-    {.a = 4, .b = 1, .c = 4},
+    {.a = 6, .b = 1, .c = 4},
 };
 
 void load_cube_mesh_data(void) {
